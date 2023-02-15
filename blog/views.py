@@ -50,6 +50,8 @@ class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
     serializers_class = serializers.CommentSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
+    def get_serializer_class(self):
+        return serializers.CommentSerializer
 
 class CategoryList(generics.ListCreateAPIView):
     queryset = Category.objects.all()
