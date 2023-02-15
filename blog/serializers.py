@@ -7,20 +7,18 @@ from django.utils.text import slugify
 class BlogSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source="author.username")
     comments = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    read_only_fields = ["author", "slug", "first_name", "last_name"]
 
     class Meta:
         model = Blog
-        fields = ["id", "title", "slug", "content", "created_on", "updated_on", "status", "f_name", "l_name", "author",
-                  "image", "comments"]
-        exclude = ["slug"]
+        fields = ["id", "title", "content",   "status", "author", "comments",  "image"]
 
-
-        def save(self, commit=True):
-            instance = super().save(commit=False)
-            instance.slug = slugify(instance.title)
-            if commit:
-                instance.save()
-            return instance
+    def save_author(self, **kwargs):
+        if "author" not in self.validated_data:
+            self.validated_data["author"] = self.context["request"].user
+    def save(self,**kwargs):
+        self.validated_data["slug"] = slugify(self.validated_data.get("title"))
+        return super().save(**kwargs)
 
 
 class UserSerializer(serializers.ModelSerializer):
