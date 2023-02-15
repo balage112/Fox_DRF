@@ -45,11 +45,20 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    user = serializers.ReadOnlyField(source="user.username")
+    author = serializers.ReadOnlyField(source="author.username")
+
+    def create(self, validated_data):
+        blog = validated_data["blog"]
+        body = validated_data["body"]
+        author = self.context["request"].user
+
+        comment = Comment.objects.create(blog=blog, body=body, author=author)
+
+        return comment
 
     class Meta:
         model = Comment
-        fields = ["id", "user", "blog", "created", "updated", "body"]
+        fields = ["id", "blog", "body", "author", "created", "updated"]
 
 
 class CategorySerializer(serializers.ModelSerializer):

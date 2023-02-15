@@ -42,12 +42,10 @@ class Blog(models.Model):
 
 class Comment(models.Model):
     created = models.DateTimeField(auto_now_add=True)
-    body = models.TextField(blank=False)
-    owner = models.ForeignKey("auth.User", on_delete=models.CASCADE, related_name='comments')
-    blog = models.ForeignKey("Blog", on_delete=models.CASCADE, related_name='comments')
-    created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now_add=True)
-
+    body = models.TextField(blank=False)
+    author = models.ForeignKey("auth.User", on_delete=models.CASCADE, related_name='comments')
+    blog = models.ForeignKey("Blog", on_delete=models.CASCADE, related_name='comments')
 
     class Meta:
         ordering = ["-created"]
