@@ -21,7 +21,7 @@ class BlogSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         user = self.context["request"].user
-        if not user.is_staff:
+        if not user.is_authenticated:
             data.pop("slug")
         return data
 
