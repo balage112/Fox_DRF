@@ -8,14 +8,23 @@ class BlogSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source="author.username")
     author_first_name = serializers.ReadOnlyField(source="author.first_name")
     author_last_name = serializers.ReadOnlyField(source="author.last_name")
-    author_slug = serializers.ReadOnlyField(source="author.slug")
+    slug = serializers.ReadOnlyField()
     comments = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     read_only_fields = ["author", "first_name", "last_name"]
 
     class Meta:
         model = Blog
         fields = ["id", "title", "content", "status", "author", "comments",  "image",
-                  "created_on", "updated_on", "author_first_name", "author_last_name", "author_slug"]
+                  "created_on", "updated_on", "author_first_name", "author_last_name", "slug"]
+
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        user = self.context["request"].user
+        if not user.is_staff:
+            data.pop("slug")
+        return data
+
 
     def save_author(self, **kwargs):
         if "author" not in self.validated_data:
