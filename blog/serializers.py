@@ -6,16 +6,21 @@ from django.utils.text import slugify
 
 class BlogSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source="author.username")
+    author_first_name = serializers.ReadOnlyField(source="author.first_name")
+    author_last_name = serializers.ReadOnlyField(source="author.last_name")
+    author_slug = serializers.ReadOnlyField(source="author.slug")
     comments = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    read_only_fields = ["author", "slug", "first_name", "last_name"]
+    read_only_fields = ["author", "first_name", "last_name"]
 
     class Meta:
         model = Blog
-        fields = ["id", "title", "content",   "status", "author", "comments",  "image"]
+        fields = ["id", "title", "content", "status", "author", "comments",  "image",
+                  "created_on", "updated_on", "author_first_name", "author_last_name", "author_slug"]
 
     def save_author(self, **kwargs):
         if "author" not in self.validated_data:
             self.validated_data["author"] = self.context["request"].user
+            return super().save(**kwargs)
     def save(self,**kwargs):
         self.validated_data["slug"] = slugify(self.validated_data.get("title"))
         return super().save(**kwargs)
