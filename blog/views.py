@@ -5,6 +5,7 @@ from .serializers import BlogSerializer
 from .models import Blog, Comment, Category
 from rest_framework import permissions
 from .permissions import IsOwnerOrReadOnly
+from rest_framework.filters import SearchFilter
 
 
 
@@ -25,6 +26,8 @@ class BlogList(generics.ListCreateAPIView):
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [SearchFilter]
+    search_fields = ["title", "content", "author__username", "author__first_name", "author__last_name"]
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
